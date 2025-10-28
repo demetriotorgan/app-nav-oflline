@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import useSync from '../hooks/useSync'
 
-const FormTarefa = () => {
+const FormTarefa = ({onSave}) => {
   const [tarefa, setTarefa] = useState('')
   const [status, setStatus] = useState('')
   const { salvarTarefa } = useSync()
@@ -20,8 +20,11 @@ const FormTarefa = () => {
 
     try {
       await salvarTarefa(novaTarefa)
-      setStatus('✅ Tarefa salva com sucesso (local ou online)')
-      setTarefa('')
+      setStatus('✅ Tarefa salva com sucesso (local ou online)');
+      setTarefa('');
+
+      if(onSave) onSave();
+      
     } catch (erro) {
       console.error('Erro ao salvar tarefa:', erro)
       setStatus('❌ Erro ao salvar tarefa.')

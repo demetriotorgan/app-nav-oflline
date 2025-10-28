@@ -44,7 +44,9 @@ export default function useSync() {
         }
       }
 
-      console.log('🎉 Sincronização concluída.')
+      console.log('🎉 Sincronização concluída.');
+      // 🔔 dispara evento global para notificar que há novas tarefas no servidor
+      window.dispatchEvent(new Event('tarefas-sincronizadas'))
     } catch (erro) {
       console.error('❌ Erro geral durante sincronização:', erro.message)
     }

@@ -37,7 +37,7 @@ const carregarTarefas = useCallback(async () => {
 
   // 🔁 Carrega automaticamente ao montar o componente
   useEffect(() => {
-    carregarTarefas()
+    carregarTarefas();
   }, [carregarTarefas])
 
   // Retorna tudo que o App precisa

@@ -1,27 +1,12 @@
 import './App.css'
 import useSync from './hooks/useSync'
 import FormTarefa from './components/FormTarefa'
-import { useCallback, useEffect, useState } from 'react'
-import axios from 'axios';
+import useTarefas from './hooks/useTarefas'
 
 function App() {
-const [tarefas, setTarefas] = useState([]);
+const { tarefas, carregarTarefas, carregando, erro } = useTarefas();
+useSync() //ativa sincronização
 
-const carregarTarefas = useCallback(async()=>{
-  try {
-  const response = await axios.get('https://api-navigator.vercel.app/listar-tarefas');
-  setTarefas(response.data);
-  // console.log(response.data);  
-  } catch (error) {
-   console.error('Erro ao carregar tarefas:', erro.message); 
-  }  
-},[]);
-
-useEffect(()=>{
-carregarTarefas();
-},[carregarTarefas]);
-
-  useSync() //ativa sincronização
   return (
     <div>
       <h1>App Navegator</h1>

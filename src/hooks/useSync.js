@@ -34,7 +34,7 @@ export default function useSync() {
           )
 
           if (response.status === 201) {
-            await removerLocal(item.id)
+            await removerLocal(item.id || item._id || item.descricao)
             console.log(`✅ Tarefa sincronizada: ${item.descricao}`)
           } else {
             console.warn(`⚠️ Tarefa ${item.id} não sincronizada (status ${response.status})`)

@@ -17,6 +17,11 @@ export default function useSync() {
       console.log(`🔄 Sincronizando ${pendentes.length} tarefas pendentes...`)
 
       for (const item of pendentes) {
+        if (!item.descricao || typeof item.descricao !== 'string' || item.descricao.trim() === '') {
+    console.warn(`⚠️ Ignorando tarefa inválida localmente armazenada:`, item)
+    await removerLocal(item.id)
+    continue
+  }
         const payload = {
           descricao: item.descricao,
           data: item.data || new Date().toISOString(),

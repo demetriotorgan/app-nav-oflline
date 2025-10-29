@@ -4,7 +4,7 @@ import { listarLocal, removerLocal, salvarLocal } from '../services/db'
 
 export default function useSync() {
   // Função de sincronização — envia pendentes para o servidor
-  const sync = useCallback(async () => {
+  const sync = useCallback(async () => {    
     if (!navigator.onLine) return
 
     try {
@@ -80,7 +80,9 @@ export default function useSync() {
         }
       } else {
         console.log('📴 Offline — salvando tarefa localmente...')
-        await salvarLocal(payload)
+        await salvarLocal(payload)    
+         // 🔔 Notifica o App que há uma nova tarefa local
+    window.dispatchEvent(new CustomEvent('nova-tarefa-local', { detail: payload }))    
       }
     },
     [sync]

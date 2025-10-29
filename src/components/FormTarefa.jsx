@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
-import useSync from '../hooks/useSync'
 
-const FormTarefa = ({onSave}) => {
+
+const FormTarefa = ({onSave,onAddLocal,salvarTarefa }) => {
   const [tarefa, setTarefa] = useState('')
   const [status, setStatus] = useState('')
-  const { salvarTarefa } = useSync()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -17,13 +16,19 @@ const FormTarefa = ({onSave}) => {
       descricao: tarefa.trim(),
       data: new Date().toISOString(),
     }
-
-    try {
-      await salvarTarefa(novaTarefa)
+// 🔹 Atualiza imediatamente a tela
+     if (onAddLocal){      
+       onAddLocal(novaTarefa)
+     }
       setStatus('✅ Tarefa salva com sucesso (local ou online)');
       setTarefa('');
 
-      if(onSave) onSave();
+    try {
+      await salvarTarefa(novaTarefa)
+     if (navigator.onLine && onSave) {
+      await onSave() // recarrega do servidor após sincronizar
+    }    
+      // if(onSave) onSave();
       
     } catch (erro) {
       console.error('Erro ao salvar tarefa:', erro)

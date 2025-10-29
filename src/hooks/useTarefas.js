@@ -8,7 +8,7 @@ export default function useTarefas() {
   const [erro, setErro] = useState(null)
 
   // 🔄 Função para carregar tarefas do servidor
-const carregarTarefas = useCallback(async () => {
+const carregarTarefas = useCallback(async () => {    
   try {
     setCarregando(true)
     setErro(null)
@@ -25,7 +25,7 @@ const carregarTarefas = useCallback(async () => {
         seen.add(key)
         unicos.push(t)
       }
-    }
+    }    
     setTarefas(unicos)
   } catch (error) {
     console.error('Erro ao carregar tarefas:', error.message)

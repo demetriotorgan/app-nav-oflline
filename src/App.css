@@ -5,9 +5,25 @@
   text-align: center;
 }
 
-.card-tarefa{
-  border: 1px solid #000;
-  margin: 10px;
-  border-radius: 10px;
+body, html {
+  overflow-y: auto !important;
 }
+
+div {
+  overflow: visible !important;
+}
+
+.card-tarefa{
+   border: 2px solid #ff006e !important;
+  background: #fff9c4 !important;
+  color: #000 !important;
+  padding: 10px !important;
+  margin: 6px 0 !important;
+  display: block !important;
+  position: relative !important;
+  z-index: 10 !important;
+   margin: 8px 0;
+}
+
+
 

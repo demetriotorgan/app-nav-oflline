@@ -25,5 +25,21 @@ div {
    margin: 8px 0;
 }
 
+.status-icone {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  margin-left: 8px;
+  object-fit: contain;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.status-icone:hover {
+  transform: scale(1.1);
+}
+
+
 
 

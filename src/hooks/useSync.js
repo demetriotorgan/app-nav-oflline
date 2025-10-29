@@ -1,100 +1,56 @@
-import { useEffect, useCallback } from 'react'
-import axios from 'axios'
-import { listarLocal, removerLocal, salvarLocal } from '../services/db'
+import { useEffect, useCallback, useState } from 'react'
+import { syncItem, salvarOffline, salvarOnline, listarPendentes, criarPayload } from './syncHelpers'
 
 export default function useSync() {
-  // Função de sincronização — envia pendentes para o servidor
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+
   const sync = useCallback(async () => {    
     if (!navigator.onLine) return
 
     try {
-      const pendentes = await listarLocal()
-      if (pendentes.length === 0) {
+      const pendentes = await listarPendentes()
+      if (!pendentes.length) {
         console.log('📭 Nenhuma tarefa pendente para sincronizar.')
         return
       }
 
       console.log(`🔄 Sincronizando ${pendentes.length} tarefas pendentes...`)
-
       for (const item of pendentes) {
-        if (!item.descricao || typeof item.descricao !== 'string' || item.descricao.trim() === '') {
-    console.warn(`⚠️ Ignorando tarefa inválida localmente armazenada:`, item)
-    await removerLocal(item.id)
-    continue
-  }
-        const payload = {
-          descricao: item.descricao,
-          data: item.data || new Date().toISOString(),
-        }
-
-        try {
-          const response = await axios.post(
-            'https://api-navigator.vercel.app/salvar-tarefa',
-            payload
-          )
-
-          if (response.status === 201) {
-            await removerLocal(item.id || item._id || item.descricao)
-            console.log(`✅ Tarefa sincronizada: ${item.descricao}`)
-          } else {
-            console.warn(`⚠️ Tarefa ${item.id} não sincronizada (status ${response.status})`)
-          }
-        } catch (erro) {
-          console.error(`❌ Erro ao sincronizar tarefa ${item.id}:`, erro.message)
-        }
+        await syncItem(item)
       }
-
-      console.log('🎉 Sincronização concluída.');
-      // 🔔 dispara evento global para notificar que há novas tarefas no servidor
+      console.log('🎉 Sincronização concluída.')
       window.dispatchEvent(new Event('tarefas-sincronizadas'))
     } catch (erro) {
       console.error('❌ Erro geral durante sincronização:', erro.message)
     }
   }, [])
 
-  // Função para salvar uma nova tarefa
   const salvarTarefa = useCallback(
     async (novaTarefa) => {
-      const payload = {
-        descricao: novaTarefa.descricao,
-        data: novaTarefa.data || new Date().toISOString(),
-      }
-
+      const payload = criarPayload(novaTarefa)
       if (navigator.onLine) {
-        try {
-          const response = await axios.post(
-            'https://api-navigator.vercel.app/salvar-tarefa',
-            payload
-          )
-          if (response.status === 201) {
-            console.log('✅ Tarefa salva diretamente no servidor!')
-          } else {
-            console.warn('⚠️ Resposta inesperada do servidor:', response.status)
-          }
-
-          // mesmo online, pode tentar limpar pendentes antigos
-          await sync()
-        } catch (erro) {
-          console.error('⚠️ Falha ao salvar online, salvando localmente...', erro.message)
-          await salvarLocal(payload)
-        }
+        await salvarOnline(payload, sync)
       } else {
-        console.log('📴 Offline — salvando tarefa localmente...')
-        await salvarLocal(payload)    
-         // 🔔 Notifica o App que há uma nova tarefa local
-    window.dispatchEvent(new CustomEvent('nova-tarefa-local', { detail: payload }))    
+        await salvarOffline(payload)
       }
     },
     [sync]
   )
 
-  // Quando voltar online, sincroniza automaticamente
   useEffect(() => {
+    const updateStatus = () => setIsOnline(navigator.onLine)
+    window.addEventListener('online', updateStatus)
+    window.addEventListener('offline', updateStatus)
+
     window.addEventListener('online', sync)
     sync() // tenta sincronizar logo que o app carrega
-    return () => window.removeEventListener('online', sync)
+    return () => {
+      window.removeEventListener('online', sync)
+      
+      window.removeEventListener('online', updateStatus)
+      window.removeEventListener('offline', updateStatus)
+    }
   }, [sync])
 
-  // Retorna a função de salvar para ser usada em qualquer componente
-  return { salvarTarefa }
+  return { salvarTarefa, isOnline }
 }

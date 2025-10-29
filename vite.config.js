@@ -7,19 +7,32 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'robots.txt'],
+      includeAssets: [
+        'favicon.svg',
+        'offline.gif',
+        'online.gif',
+        'vite.svg'
+      ],
       manifest: {
-        name: 'App Offline React',
-        short_name: 'AppOffline',
-        start_url: '/',
-        display: 'standalone',
-        background_color: '#ffffff',
-        theme_color: '#007bff',
-        icons: [
-          { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' }
-        ]
-      }
-    })
-  ]
+        name: 'Navigator Tasks',
+        short_name: 'Navigator',
+        description: 'App de tarefas com suporte offline',
+        theme_color: '#ffffff',        
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,gif,png}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/api-navigator\.vercel\.app\/listar-tarefas/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 50, maxAgeSeconds: 3600 },
+            },
+          },
+        ],
+      },
+    }),
+  ],
 })

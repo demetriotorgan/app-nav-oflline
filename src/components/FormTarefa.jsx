@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 
-const FormTarefa = ({onSave,onAddLocal,salvarTarefa }) => {
+const FormTarefa = ({onSave,salvarTarefa }) => {
   const [tarefa, setTarefa] = useState('')
   const [status, setStatus] = useState('')
 
@@ -16,10 +16,6 @@ const FormTarefa = ({onSave,onAddLocal,salvarTarefa }) => {
       descricao: tarefa.trim(),
       data: new Date().toISOString(),
     }
-// 🔹 Atualiza imediatamente a tela
-     if (onAddLocal){      
-       onAddLocal(novaTarefa)
-     }
       setStatus('✅ Tarefa salva com sucesso (local ou online)');
       setTarefa('');
 
@@ -28,7 +24,6 @@ const FormTarefa = ({onSave,onAddLocal,salvarTarefa }) => {
      if (navigator.onLine && onSave) {
       await onSave() // recarrega do servidor após sincronizar
     }    
-      // if(onSave) onSave();
       
     } catch (erro) {
       console.error('Erro ao salvar tarefa:', erro)
